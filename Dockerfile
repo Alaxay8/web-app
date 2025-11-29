@@ -7,6 +7,7 @@ RUN pip install --no-cache-dir flask
 
 COPY app.py .
 COPY templates ./templates
+COPY static ./static
 
 CMD ["python3", "-u", "app.py"]
 
