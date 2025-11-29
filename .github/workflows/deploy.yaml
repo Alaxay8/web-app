@@ -31,7 +31,7 @@ jobs:
           port: 228
           script: |
             set -e
-            cd /root/web-ci
+            cd /root/web-app
             docker build -t web-app .
             docker rm -f web-app || true
             docker run -d --name web-app -p 8080:8000 web-app
