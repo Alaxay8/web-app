@@ -9,18 +9,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # checkout можно оставить, но ssh-action он не нужен,
-      # пусть будет на будущее
-      - name: Checkout repository
-        uses: actions/checkout@v4
 
       - name: Deploy container on controller
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}   # в Secrets должен быть SSH_KEY с ПРИВАТНЫМ ключом
-          port: 228                     # твой нестандартный ssh-порт
+          key: ${{ secrets.SSH_KEY }}
+          port: 228
           script: |
             set -e
             cd /root/web-app
