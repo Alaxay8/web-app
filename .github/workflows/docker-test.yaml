@@ -21,7 +21,6 @@ jobs:
       - name: Run container
         run: |
           docker run -d --name web-test -p 8000:8000 web-test:latest
-          # даём приложению время подняться
           sleep 5
 
       - name: Check HTTP response
