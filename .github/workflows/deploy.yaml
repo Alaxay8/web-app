@@ -6,10 +6,13 @@ on:
   pull_request:
     branches: [ "main" ]
 
+# Общая переменная: имя образа в GHCR (всегда в нижнем регистре)
+env:
+  REGISTRY_IMAGE: ghcr.io/alaxay8/web-app
+
 jobs:
   test:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -38,9 +41,6 @@ jobs:
       contents: read
       packages: write
 
-    env:
-      OWNER: ${{ github.repository_owner | lower }}
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -50,18 +50,16 @@ jobs:
 
       - name: Build and push image
         run: |
-          IMAGE="ghcr.io/${OWNER}/web-app:${{ github.sha }}"
-          echo "IMAGE=$IMAGE" >> $GITHUB_ENV
+          IMAGE="${REGISTRY_IMAGE}:${GITHUB_SHA}"
+          echo "Using image $IMAGE"
           docker build -t "$IMAGE" .
           docker push "$IMAGE"
 
   deploy:
+    # Деплой только при пуше в main, не при PR
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
-
-    env:
-      OWNER: ${{ github.repository_owner | lower }}
 
     steps:
       - name: Deploy on controller
@@ -73,9 +71,10 @@ jobs:
           port: 228
           script: |
             set -e
-            IMAGE="ghcr.io/${OWNER}/web-app:${{ github.sha }}"
 
-            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+            IMAGE="${REGISTRY_IMAGE}:${{ github.sha }}"
+
+            docker login ghcr.io -u "${{ github.actor }}" -p "${{ secrets.GITHUB_TOKEN }}"
 
             docker pull "$IMAGE"
             docker rm -f web-app || true
