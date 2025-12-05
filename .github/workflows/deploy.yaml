@@ -75,4 +75,4 @@ jobs:
 
             docker pull "$IMAGE"
             docker rm -f web-app || true
-            docker run -d --name web-app -p 8080:8000 "$IMAGE"
+            docker run -d --name web-app --restart=always -p 8080:8000 "$IMAGE"
